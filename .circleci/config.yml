@@ -1,0 +1,25 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:1.8
+    working_directory: ~/tmp
+    steps:
+      - setup_remote_docker:
+          reusable: true
+      - run:
+          name: Install tools
+          command: |
+            sudo apt-get update
+            wget https://github.com/gohugoio/hugo/releases/download/v0.41/hugo_0.41_Linux-64bit.deb
+            sudo dpkg -i hugo_0.41_Linux-64bit.deb
+            rm hugo_0.41_Linux-64bit.deb
+      - checkout
+      - deploy:
+          name: Deploy gh-pages branch to production
+          command: |
+            hugo --theme=minimal
+            cd public
+            git add -A
+            git commit -m '更新'
+            git push origin gh-pages
